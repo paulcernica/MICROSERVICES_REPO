@@ -1,6 +1,7 @@
 package com.eazybytes.accounts.service.impl;
 
 import com.eazybytes.accounts.constants.AccountsConstants;
+import com.eazybytes.accounts.dto.AccountsDto;
 import com.eazybytes.accounts.dto.CustomerDto;
 import com.eazybytes.accounts.entity.Accounts;
 import com.eazybytes.accounts.entity.Customer;
@@ -48,6 +49,59 @@ public class AccountsServiceImpl implements IAccountsService {
         CustomerDto customerDto = CustomerMapper.mapToCustomerDto(customer);
         customerDto.setAccountsDto(AccountsMapper.mapToAccountsDto(accounts));
         return customerDto;
+    }
+
+    @Override
+    public boolean updateAccount(CustomerDto customerDto) {
+        boolean isUpdated = false;
+        AccountsDto accountsDto = customerDto.getAccountsDto();
+        if (accountsDto != null) {
+            Accounts accounts = accountsRepository.findById(accountsDto.getAccountNumber()).orElseThrow(
+                    () -> new ResourceNotFoundException("Accounts", "accountNumber", accountsDto.getAccountNumber().toString())
+            );
+
+            Long customerId = accounts.getCustomerId();
+            Customer customer = customerRepository.findById(customerId).orElseThrow(
+                    () -> new ResourceNotFoundException("Customer", "customerId", customerId.toString())
+            );
+            if (customer.getMobileNumber() != null && !customerDto.getMobileNumber().equals(customer.getMobileNumber())) {
+                if (customerRepository.findByMobileNumber(customerDto.getMobileNumber()).isPresent()) {
+                    throw new CustomerAlreadyExistsException("Another customer already registered with mobile number " + customer.getMobileNumber());
+                }
+            }
+            updateCustomerFromDto(customerDto, customer);
+            updateAccountsFromDto(accountsDto, accounts);
+
+            customerRepository.save(customer);
+            accountsRepository.save(accounts);
+            isUpdated = true;
+        }
+        return isUpdated;
+    }
+
+    @Override
+    public boolean deleteAccount(String mobileNumber) {
+        Customer customer = customerRepository.findByMobileNumber(mobileNumber).orElseThrow(
+                () -> new ResourceNotFoundException("Customer", "mobileNumber", mobileNumber)
+        );
+        try {
+            accountsRepository.deleteByCustomerId(customer.getCustomerId());
+            customerRepository.deleteById(customer.getCustomerId());
+        } catch (Exception ex) {
+            return false;
+        }
+        return true;
+    }
+
+    public static void updateCustomerFromDto(CustomerDto dto, Customer customer) {
+        customer.setName(dto.getName());
+        customer.setEmail(dto.getEmail());
+        customer.setMobileNumber(dto.getMobileNumber());
+    }
+
+    public static void updateAccountsFromDto(AccountsDto dto, Accounts accounts) {
+        accounts.setAccountType(dto.getAccountType());
+        accounts.setBranchAddress(dto.getBranchAddress());
     }
 
     private Accounts createNewAccount (Customer customer) {
