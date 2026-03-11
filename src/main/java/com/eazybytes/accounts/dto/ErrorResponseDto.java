@@ -1,0 +1,44 @@
+package com.eazybytes.accounts.dto;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import org.springframework.http.HttpStatus;
+
+import java.time.LocalDateTime;
+import java.util.Map;
+
+@Data
+@AllArgsConstructor
+@Schema(
+        name = "ErrorResponse",
+        description = "Schema to hold error response information"
+)
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class ErrorResponseDto {
+
+    @Schema(
+            description = "API path invoked by client"
+    )
+    private String apiPath;
+    @Schema(
+            description = "Error code representing the error happened"
+    )
+    private HttpStatus errorCode;
+    @Schema(
+            description = "Error message representing the error happened"
+    )
+    private String errorMessage;
+    @Schema(
+            description = "Time representing when the error happened"
+    )
+    private LocalDateTime errorTime;
+
+    // Optional: only populated for validation errors
+    @Schema(
+            description = "Validation errors where the key is the field name and the value is the validation message",
+            example = "{\"firstName\": \"must not be blank\", \"age\": \"must be greater than 18\"}"
+    )
+    private Map<String, String> validationErrors;
+}
