@@ -30,7 +30,7 @@ import org.springframework.web.bind.annotation.*;
 @Validated
 public class AccountsController {
 
-    private IAccountsService accountsService;
+    private final IAccountsService accountsService;
 
     @Operation(
             summary = "Create Account REST API",

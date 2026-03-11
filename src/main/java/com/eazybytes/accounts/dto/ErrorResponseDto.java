@@ -1,5 +1,6 @@
 package com.eazybytes.accounts.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -14,6 +15,7 @@ import java.util.Map;
         name = "ErrorResponse",
         description = "Schema to hold error response information"
 )
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ErrorResponseDto {
 
     @Schema(

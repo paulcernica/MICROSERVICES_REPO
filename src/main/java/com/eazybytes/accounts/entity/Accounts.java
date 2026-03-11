@@ -7,12 +7,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @Entity
 @Getter
 @Setter
-@SpringBootApplication
 @ToString
 @NoArgsConstructor
 public class Accounts extends BaseEntity{
